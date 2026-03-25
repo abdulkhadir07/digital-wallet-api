@@ -11,11 +11,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
         @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) {
             http
-                    .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless APIs
+                    .csrf(csrf -> csrf.disable())// Disable CSRF for stateless APIs
                     .authorizeHttpRequests(auth -> auth
                             .requestMatchers("/auth/register").permitAll() // Anyone can register
                             .anyRequest().authenticated() // Everything else is locked down
