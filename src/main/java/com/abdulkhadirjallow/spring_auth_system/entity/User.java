@@ -13,13 +13,12 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "users_entity")
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -45,7 +44,7 @@ public class User {
 
     @NotBlank(message = "Password is required")
     @Column(nullable = false)
-    @Size(min = 8, max = 20, message = "Password must be at least 8 characters long")
+    @Size(min = 8, max = 20, message = "Password must be between 8 and 20 characters")
     private String password;
 
     @Column(nullable = false)
