@@ -24,7 +24,7 @@ public class AuthService {
     public void register(RegisterRequest registerRequest) {
 
         // Email Uniqueness (checks if email exist)
-        if (userRepository.existsByEmail(registerRequest.getEmail())) {
+        if (userRepository.existsByEmail(registerRequest.getEmail().trim().toLowerCase())) {
             throw new IllegalArgumentException("Email already exists");
         }
 
@@ -51,7 +51,7 @@ public class AuthService {
     public void login(LoginRequest loginRequest) {
 
         // find user by email
-       User user = userRepository.findByEmail(loginRequest.getEmail())
+       User user = userRepository.findByEmail(loginRequest.getEmail().trim().toLowerCase())
                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
 
        // Compare raw password with the hashed password in DB
@@ -68,7 +68,7 @@ public class AuthService {
     public void verify(VerifyRequest verifyRequest) {
 
         // find user
-        User user = userRepository.findByEmail(verifyRequest.getEmail())
+        User user = userRepository.findByEmail(verifyRequest.getEmail().trim().toLowerCase())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // Check if user is already verified
