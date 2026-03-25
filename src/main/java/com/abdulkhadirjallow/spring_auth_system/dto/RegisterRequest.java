@@ -19,7 +19,7 @@ public class RegisterRequest {
     @NotNull(message = "Date of birth is required")
     private LocalDate dateOfBirth;
 
-    @Email(message = "Please enter a valid email")
+    @Email(message = "Please enter a valid email address")
     @NotBlank(message = " Email is required")
     private String email;
 

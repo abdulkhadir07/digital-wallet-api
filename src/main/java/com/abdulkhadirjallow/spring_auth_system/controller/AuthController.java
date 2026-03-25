@@ -1,5 +1,7 @@
 package com.abdulkhadirjallow.spring_auth_system.controller;
 
+import com.abdulkhadirjallow.spring_auth_system.dto.LoginRequest;
+import com.abdulkhadirjallow.spring_auth_system.dto.LoginResponse;
 import com.abdulkhadirjallow.spring_auth_system.dto.RegisterRequest;
 import com.abdulkhadirjallow.spring_auth_system.dto.RegisterResponse;
 import com.abdulkhadirjallow.spring_auth_system.service.AuthService;
@@ -32,5 +34,18 @@ public class AuthController {
 
         // Return the response with 201 status
         return new ResponseEntity<>(registerResponse, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
+
+        // call service to do the logic
+        authService.login(loginRequest);
+
+        // create response object
+        LoginResponse loginResponse = new LoginResponse("login successfully.");
+
+        // return response
+        return new ResponseEntity<>(loginResponse, HttpStatus.OK);
     }
 }

@@ -1,5 +1,6 @@
 package com.abdulkhadirjallow.spring_auth_system.service;
 
+import com.abdulkhadirjallow.spring_auth_system.dto.LoginRequest;
 import com.abdulkhadirjallow.spring_auth_system.dto.RegisterRequest;
 import com.abdulkhadirjallow.spring_auth_system.entity.User;
 import com.abdulkhadirjallow.spring_auth_system.repository.UserRepository;
@@ -35,5 +36,21 @@ public class AuthService {
 
         // Save to database
         userRepository.save(newUser);
+    }
+
+    public void login(LoginRequest loginRequest) {
+
+        // find user by email
+       User user = userRepository.findByEmail(loginRequest.getEmail())
+               .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+
+       // Compare raw password with the hashed password in DB
+       if(!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+           throw new RuntimeException("Invalid email or password");
+       }
+
+       if(!user.isVerified()) {
+           throw new RuntimeException("Please verify your email before logging in");
+       }
     }
 }

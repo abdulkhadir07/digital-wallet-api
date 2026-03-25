@@ -16,7 +16,8 @@ public class SecurityConfig {
             http
                     .csrf(csrf -> csrf.disable())// Disable CSRF for stateless APIs
                     .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/auth/register").permitAll() // Anyone can register
+                            .requestMatchers("/auth/register").permitAll()// Anyone can register
+                            .requestMatchers("/auth/login").permitAll()
                             .anyRequest().authenticated() // Everything else is locked down
                     ).sessionManagement(session -> session
                             .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // We use JWT, not Cookies
