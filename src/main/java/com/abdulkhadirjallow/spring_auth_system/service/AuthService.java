@@ -26,9 +26,9 @@ public class AuthService {
         // Map DTO to Entity: Create the Entity from DTO
         User newUser = new User();
 
-        newUser.setFirstName(registerRequest.getFirstName());
-        newUser.setLastName(registerRequest.getLastName());
-        newUser.setEmail(registerRequest.getEmail());
+        newUser.setFirstName(registerRequest.getFirstName().trim());
+        newUser.setLastName(registerRequest.getLastName().trim());
+        newUser.setEmail(registerRequest.getEmail().trim().toLowerCase());
         newUser.setDateOfBirth(registerRequest.getDateOfBirth());
         newUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));// HASH later
         newUser.setVerified(false);

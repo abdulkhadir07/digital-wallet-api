@@ -21,10 +21,8 @@ public class SecurityConfig {
                     ).sessionManagement(session -> session
                             .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // We use JWT, not Cookies
                     );
-
             return http.build();
         }
-
         @Bean
         public BCryptPasswordEncoder passwordEncoder() {
             return new BCryptPasswordEncoder();
