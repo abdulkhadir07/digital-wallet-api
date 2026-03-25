@@ -1,9 +1,6 @@
 package com.abdulkhadirjallow.spring_auth_system.controller;
 
-import com.abdulkhadirjallow.spring_auth_system.dto.LoginRequest;
-import com.abdulkhadirjallow.spring_auth_system.dto.LoginResponse;
-import com.abdulkhadirjallow.spring_auth_system.dto.RegisterRequest;
-import com.abdulkhadirjallow.spring_auth_system.dto.RegisterResponse;
+import com.abdulkhadirjallow.spring_auth_system.dto.*;
 import com.abdulkhadirjallow.spring_auth_system.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -47,5 +44,18 @@ public class AuthController {
 
         // return response
         return new ResponseEntity<>(loginResponse, HttpStatus.OK);
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<VerifyResponse> verify(@Valid @RequestBody VerifyRequest verifyRequest) {
+
+        // call service to do the logic
+        authService.verify(verifyRequest);
+
+        // create response object
+        VerifyResponse verifyResponse = new VerifyResponse("Account successfully verified.");
+
+        // return response
+        return new ResponseEntity<>(verifyResponse, HttpStatus.OK);
     }
 }

@@ -18,6 +18,7 @@ public class SecurityConfig {
                     .authorizeHttpRequests(auth -> auth
                             .requestMatchers("/auth/register").permitAll()// Anyone can register
                             .requestMatchers("/auth/login").permitAll()
+                            .requestMatchers("/auth/verify").permitAll()
                             .anyRequest().authenticated() // Everything else is locked down
                     ).sessionManagement(session -> session
                             .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // We use JWT, not Cookies
