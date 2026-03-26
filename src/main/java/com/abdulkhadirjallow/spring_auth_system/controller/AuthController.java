@@ -40,7 +40,7 @@ public class AuthController {
         String token = authService.login(loginRequest);
 
         // create response object
-        LoginResponse loginResponse = new LoginResponse(token, "login successful.");
+        LoginResponse loginResponse = new LoginResponse( "Login successful", token);
 
         // return response
         return ResponseEntity.ok(loginResponse);
