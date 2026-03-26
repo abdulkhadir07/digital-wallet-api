@@ -5,6 +5,7 @@ import com.abdulkhadirjallow.spring_auth_system.dto.RegisterRequest;
 import com.abdulkhadirjallow.spring_auth_system.dto.VerifyRequest;
 import com.abdulkhadirjallow.spring_auth_system.entity.User;
 import com.abdulkhadirjallow.spring_auth_system.repository.UserRepository;
+import com.abdulkhadirjallow.spring_auth_system.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +16,12 @@ import java.util.Random;
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public void register(RegisterRequest registerRequest) {
@@ -44,11 +47,10 @@ public class AuthService {
 
         // Save to database
         userRepository.save(newUser);
-
         System.out.println("Verification code for " + newUser.getEmail() + ": " + code);
     }
 
-    public void login(LoginRequest loginRequest) {
+    public String login(LoginRequest loginRequest) {
 
         // find user by email
        User user = userRepository.findByEmail(loginRequest.getEmail().trim().toLowerCase())
@@ -63,6 +65,9 @@ public class AuthService {
        if (!user.isVerified()) {
            throw new RuntimeException("Please verify your email before logging in");
        }
+
+       // return the generated token string
+       return jwtService.generateToken(user);
     }
 
     public void verify(VerifyRequest verifyRequest) {

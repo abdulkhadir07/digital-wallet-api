@@ -37,13 +37,13 @@ public class AuthController {
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
 
         // call service to do the logic
-        authService.login(loginRequest);
+        String token = authService.login(loginRequest);
 
         // create response object
-        LoginResponse loginResponse = new LoginResponse("login successfully.");
+        LoginResponse loginResponse = new LoginResponse(token, "login successful.");
 
         // return response
-        return new ResponseEntity<>(loginResponse, HttpStatus.OK);
+        return ResponseEntity.ok(loginResponse);
     }
 
     @PostMapping("/verify")
