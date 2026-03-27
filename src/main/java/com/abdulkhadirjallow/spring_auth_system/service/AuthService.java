@@ -4,6 +4,8 @@ import com.abdulkhadirjallow.spring_auth_system.dto.LoginRequest;
 import com.abdulkhadirjallow.spring_auth_system.dto.RegisterRequest;
 import com.abdulkhadirjallow.spring_auth_system.dto.VerifyRequest;
 import com.abdulkhadirjallow.spring_auth_system.entity.User;
+import com.abdulkhadirjallow.spring_auth_system.exception.BadRequestException;
+import com.abdulkhadirjallow.spring_auth_system.exception.UnauthorizedException;
 import com.abdulkhadirjallow.spring_auth_system.repository.UserRepository;
 import com.abdulkhadirjallow.spring_auth_system.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,7 +30,7 @@ public class AuthService {
 
         // Email Uniqueness (checks if email exist)
         if (userRepository.existsByEmail(registerRequest.getEmail().trim().toLowerCase())) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new BadRequestException("Email already exists");
         }
 
         // Map DTO to Entity: Create the Entity from DTO
@@ -54,16 +56,16 @@ public class AuthService {
 
         // find user by email
        User user = userRepository.findByEmail(loginRequest.getEmail().trim().toLowerCase())
-               .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+               .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
 
        // Compare raw password with the hashed password in DB
        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-           throw new RuntimeException("Invalid email or password");
+           throw new UnauthorizedException("Invalid email or password");
        }
 
        // check if account is verified
        if (!user.isVerified()) {
-           throw new RuntimeException("Please verify your email before logging in");
+           throw new UnauthorizedException("Please verify your account before logging in");
        }
 
        // return the generated token string
@@ -74,11 +76,11 @@ public class AuthService {
 
         // find user
         User user = userRepository.findByEmail(verifyRequest.getEmail().trim().toLowerCase())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BadRequestException("User not found"));
 
         // Check if user is already verified
         if (user.isVerified()) {
-            throw new RuntimeException("Account is already verified");
+            throw new BadRequestException("Account is already verified");
         }
 
         // check if verification code exist
@@ -88,12 +90,12 @@ public class AuthService {
 
         // check if verification code expires
         if (user.getVerificationCodeExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Verification code has expired");
+            throw new BadRequestException("Verification code has expired");
         }
 
-        // check if verification has expired
+        // check if verification matches
         if(!user.getVerificationCode().equals(verifyRequest.getVerificationCode())) {
-            throw new RuntimeException("Verification code does not match");
+            throw new BadRequestException("Verification code does not match");
         }
 
         // update user state, clear and save

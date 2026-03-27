@@ -1,5 +1,7 @@
 package com.abdulkhadirjallow.spring_auth_system.config;
 
+import com.abdulkhadirjallow.spring_auth_system.security.JwtAccessDeniedHandler;
+import com.abdulkhadirjallow.spring_auth_system.security.JwtAuthenticationEntryPoint;
 import com.abdulkhadirjallow.spring_auth_system.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +17,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,  JwtAccessDeniedHandler jwtAccessDeniedHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
     }
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -31,6 +37,10 @@ public class SecurityConfig {
                             .anyRequest().authenticated() // Everything else is locked down
                     ).sessionManagement(session -> session
                             .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // We use JWT, not Cookies
+                    )
+                    .exceptionHandling(exception -> exception
+                            .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                            .accessDeniedHandler(jwtAccessDeniedHandler)
                     )
                     .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
             return http.build();
