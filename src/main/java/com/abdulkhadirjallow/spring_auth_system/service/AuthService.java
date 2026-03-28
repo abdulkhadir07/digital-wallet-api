@@ -94,7 +94,7 @@ public class AuthService {
         }
 
         // check if verification matches
-        if(!user.getVerificationCode().equals(verifyRequest.getVerificationCode())) {
+        if(!user.getVerificationCode().equals(verifyRequest.getVerificationCode().trim())) {
             throw new BadRequestException("Verification code does not match");
         }
 
