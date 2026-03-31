@@ -28,6 +28,11 @@ public class AuthService {
 
     public void register(RegisterRequest registerRequest) {
 
+        // Phone Number Uniqueness (check if phone number already exist)
+        if (userRepository.existsByPhoneNumber(registerRequest.getPhoneNumber().trim())) {
+            throw new BadRequestException("Phone number already exists");
+        }
+
         // Email Uniqueness (checks if email exist)
         if (userRepository.existsByEmail(registerRequest.getEmail().trim().toLowerCase())) {
             throw new BadRequestException("Email already exists");
@@ -38,8 +43,9 @@ public class AuthService {
 
         newUser.setFirstName(registerRequest.getFirstName().trim());
         newUser.setLastName(registerRequest.getLastName().trim());
-        newUser.setEmail(registerRequest.getEmail().trim().toLowerCase());
         newUser.setDateOfBirth(registerRequest.getDateOfBirth());
+        newUser.setPhoneNumber(registerRequest.getPhoneNumber().trim());
+        newUser.setEmail(registerRequest.getEmail().trim().toLowerCase());
         newUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));// HASH later
         newUser.setVerified(false);
 
@@ -49,18 +55,18 @@ public class AuthService {
 
         // Save to database
         userRepository.save(newUser);
-        System.out.println("Verification code for " + newUser.getEmail() + ": " + code);
+        System.out.println("Verification code for " + newUser.getPhoneNumber() + ": " + code);
     }
 
     public String login(LoginRequest loginRequest) {
 
-        // find user by email
-       User user = userRepository.findByEmail(loginRequest.getEmail().trim().toLowerCase())
-               .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
+        // find user by phone number
+       User user = userRepository.findByPhoneNumber(loginRequest.getPhoneNumber().trim())
+               .orElseThrow(() -> new UnauthorizedException("Invalid phone number or password"));
 
        // Compare raw password with the hashed password in DB
        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-           throw new UnauthorizedException("Invalid email or password");
+           throw new UnauthorizedException("Invalid phone number or password");
        }
 
        // check if account is verified
@@ -74,8 +80,8 @@ public class AuthService {
 
     public void verify(VerifyRequest verifyRequest) {
 
-        // find user
-        User user = userRepository.findByEmail(verifyRequest.getEmail().trim().toLowerCase())
+        // find user by phone Number
+        User user = userRepository.findByPhoneNumber(verifyRequest.getPhoneNumber().trim())
                 .orElseThrow(() -> new BadRequestException("User not found"));
 
         // Check if user is already verified
@@ -94,7 +100,7 @@ public class AuthService {
         }
 
         // check if verification matches
-        if(!user.getVerificationCode().equals(verifyRequest.getVerificationCode().trim())) {
+        if(!user.getVerificationCode().trim().equals(verifyRequest.getVerificationCode().trim())) {
             throw new BadRequestException("Verification code does not match");
         }
 

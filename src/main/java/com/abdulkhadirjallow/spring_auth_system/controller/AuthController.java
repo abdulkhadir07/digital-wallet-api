@@ -27,7 +27,7 @@ public class AuthController {
         authService.register(reg);
 
         // Create the response object
-        RegisterResponse registerResponse = new RegisterResponse("User registered successfully. Please verify your email.");
+        RegisterResponse registerResponse = new RegisterResponse("User registered successfully. Please verify your phone number.");
 
         // Return the response with 201 status
         return new ResponseEntity<>(registerResponse, HttpStatus.CREATED);

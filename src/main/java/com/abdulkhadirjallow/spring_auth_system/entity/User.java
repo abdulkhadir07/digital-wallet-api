@@ -38,9 +38,12 @@ public class User {
     @Column(nullable = false)
     private LocalDate dateOfBirth;
 
-    @Email(message = "Please provide a valid email address")
-    @NotBlank(message = "Email is required")
+    @NotNull(message = "Phone number is required")
     @Column(nullable = false, unique = true)
+    private String phoneNumber;
+
+    @Email(message = "Please provide a valid email address")
+    @Column(nullable = true, unique = true)
     private String email;
 
     @NotBlank(message = "Password is required")

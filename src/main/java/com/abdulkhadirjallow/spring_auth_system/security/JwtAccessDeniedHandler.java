@@ -3,6 +3,7 @@ package com.abdulkhadirjallow.spring_auth_system.security;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
@@ -23,12 +24,13 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     }
 
     @Override
-    public void handle(HttpServletRequest request,
-                       HttpServletResponse response,
-                       AccessDeniedException accessDeniedException) throws IOException, ServletException {
+    public void handle(
+            @NotNull HttpServletRequest request,
+            @NotNull HttpServletResponse response,
+            @NotNull AccessDeniedException accessDeniedException) throws IOException, ServletException {
 
         ErrorResponse errorResponse = new ErrorResponse(
-                "Acess denied",
+                "Access denied",
                 HttpStatus.FORBIDDEN.value(),
                 LocalDateTime.now(),
                 null
