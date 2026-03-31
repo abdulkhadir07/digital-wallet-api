@@ -7,8 +7,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
@@ -22,14 +20,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByPhoneNumber(phoneNumber.trim())
                 .orElseThrow(() -> new UsernameNotFoundException("Invalid username or password."));
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getPhoneNumber(),
-                user.getPassword(),
-                user.isVerified(),
-                true,
-                true,
-                true,
-                Collections.emptyList()
-        );
+        return UserPrincipal.fromUser(user);
     }
 }

@@ -28,7 +28,6 @@ public class AuthService {
 
     public void register(RegisterRequest registerRequest) {
 
-
         // Phone Number Uniqueness (check if phone number already exist)
         if (userRepository.existsByPhoneNumber(registerRequest.getPhoneNumber().trim())) {
             throw new BadRequestException("Phone number already exists");
@@ -44,7 +43,7 @@ public class AuthService {
 
         newUser.setFirstName(registerRequest.getFirstName().trim());
         newUser.setLastName(registerRequest.getLastName().trim());
-        newUser.setDateOfBirth(registerRequest.getDateOfBirth());
+        /*newUser.setDateOfBirth(registerRequest.getDateOfBirth());*/
         newUser.setPhoneNumber(registerRequest.getPhoneNumber().trim());
         newUser.setEmail(registerRequest.getEmail().trim().toLowerCase());
         newUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));// HASH later

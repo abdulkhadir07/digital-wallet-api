@@ -12,6 +12,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // fetching a specific user for login
     Optional<User> findByEmail(String email);
     Optional<User> findByPhoneNumber(String phoneNumber);
+    Optional<User> findById(Long Id);
 
     // Checks if email already exists
     boolean existsByEmail(String email);

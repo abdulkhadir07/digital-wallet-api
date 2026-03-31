@@ -29,6 +29,9 @@ public class KycProfile {
     private User user;
 
     // Document Details
+    @NotNull(message = "Date of birth is required")
+    private LocalDateTime dateOfBirth;
+
     @NotBlank(message = "ID type is required")
     @Column(nullable = false)
     private String idType; // PASSPORT, ID CARD, DRIVER'S LICENSE, VOTER'S CARD
