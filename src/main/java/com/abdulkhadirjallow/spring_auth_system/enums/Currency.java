@@ -13,7 +13,7 @@ public enum Currency {
 
     // Asia
     JPY, // Japan
-    IND, // India
+    INR, // India
     CNY,
     KRW,
 
