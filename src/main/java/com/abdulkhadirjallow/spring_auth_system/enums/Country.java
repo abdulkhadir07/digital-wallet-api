@@ -3,56 +3,54 @@ package com.abdulkhadirjallow.spring_auth_system.enums;
 public enum Country {
 
     // North America
-    USA(Currency.USD, Continent.NORTH_AMERICA, Currency.USD),
-    CANADA(Currency.CAD, Continent.NORTH_AMERICA, Currency.CAD),
+    USA(Currency.USD, Continent.NORTH_AMERICA),
+    CANADA(Currency.CAD, Continent.NORTH_AMERICA),
 
     // Europe
-    GERMANY(Currency.EUR, Continent.EUROPE, Currency.EUR),
-    UK(Currency.GBP, Continent.EUROPE, Currency.GBP),
-    SWITZERLAND(Currency.CHF, Continent.EUROPE, Currency.CHF),
-    FRANCE(Currency.EUR, Continent.EUROPE, Currency.EUR),
-    ITALY(Currency.EUR, Continent.EUROPE, Currency.EUR),
-    SPAIN(Currency.EUR, Continent.EUROPE, Currency.EUR),
+    GERMANY(Currency.EUR, Continent.EUROPE),
+    UK(Currency.GBP, Continent.EUROPE),
+    SWITZERLAND(Currency.CHF, Continent.EUROPE),
+    FRANCE(Currency.EUR, Continent.EUROPE),
+    ITALY(Currency.EUR, Continent.EUROPE),
+    SPAIN(Currency.EUR, Continent.EUROPE),
 
     // Asia
-    JAPAN(Currency.JPY, Continent.ASIA, Currency.JPY),
-    INDIA(Currency.INR, Continent.ASIA,Currency.INR),
-    CHINA(Currency.CNY, Continent.ASIA, Currency.CNY),
-    SOUTH_KOREA(Currency.KRW, Continent.ASIA, Currency.KRW),
+    JAPAN(Currency.JPY, Continent.ASIA),
+    INDIA(Currency.INR, Continent.ASIA),
+    CHINA(Currency.CNY, Continent.ASIA),
+    SOUTH_KOREA(Currency.KRW, Continent.ASIA),
 
     // Africa
-    GAMBIA(Currency.GMD, Continent.AFRICA,Currency.GMD),
-    NIGERIA(Currency.NGN, Continent.AFRICA,Currency.NGN),
-    GHANA(Currency.GHS, Continent.AFRICA,Currency.GHS),
-    MOROCCO(Currency.MAD, Continent.AFRICA,Currency.MAD),
-    SOUTH_AFRICA(Currency.ZAR, Continent.AFRICA,Currency.ZAR),
-    ETHIOPIA(Currency.ETB, Continent.AFRICA,Currency.ETB),
-    KENYA(Currency.KES, Continent.AFRICA,Currency.KES),
+    GAMBIA(Currency.GMD, Continent.AFRICA),
+    NIGERIA(Currency.NGN, Continent.AFRICA),
+    GHANA(Currency.GHS, Continent.AFRICA),
+    MOROCCO(Currency.MAD, Continent.AFRICA),
+    SOUTH_AFRICA(Currency.ZAR, Continent.AFRICA),
+    ETHIOPIA(Currency.ETB, Continent.AFRICA),
+    KENYA(Currency.KES, Continent.AFRICA),
 
     // West Africa (XOF)
-    SENEGAL(Currency.XOF, Continent.AFRICA,Currency.XOF),
-    MALI(Currency.XOF, Continent.AFRICA,Currency.XOF),
-    IVORY_COAST(Currency.XOF, Continent.AFRICA,Currency.XOF),
-    BURKINA_FASO(Currency.XOF, Continent.AFRICA,Currency.XOF),
+    SENEGAL(Currency.XOF, Continent.AFRICA),
+    MALI(Currency.XOF, Continent.AFRICA),
+    IVORY_COAST(Currency.XOF, Continent.AFRICA),
+    BURKINA_FASO(Currency.XOF, Continent.AFRICA),
 
     // Central Africa (XAF)
-    CAMEROON(Currency.XAF, Continent.AFRICA,Currency.XAF),
-    CONGO(Currency.XAF, Continent.AFRICA,Currency.XAF),;
+    CAMEROON(Currency.XAF, Continent.AFRICA),
+    CONGO(Currency.XAF, Continent.AFRICA),;
 
     // Data fields
-    private final Currency currency;
-    private final Continent continent;
     private final Currency defaultCurrency;
+    private final Continent continent;
     // Constructor
-    Country(Currency currency, Continent continent, Currency defaultCurrency)  {
-        this.currency = currency;
-        this.continent = continent;
+    Country(Currency defaultCurrency, Continent continent)  {
         this.defaultCurrency = defaultCurrency;
+        this.continent = continent;
     }
 
     // Getters
-    public Currency getCurrency() {return currency;}
-    public Continent getContinent() {return continent;}
     public Currency getDefaultCurrency() {return defaultCurrency;}
+    public Continent getContinent() {return continent;}
+
 
 }
