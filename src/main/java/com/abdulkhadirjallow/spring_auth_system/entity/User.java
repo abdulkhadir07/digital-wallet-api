@@ -1,5 +1,6 @@
 package com.abdulkhadirjallow.spring_auth_system.entity;
 
+import com.abdulkhadirjallow.spring_auth_system.enums.Country;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -38,9 +39,9 @@ public class User {
     @Column(nullable = false)
     private LocalDate dateOfBirth;
 
-    @NotBlank(message = "Country is required")
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String country;
+    private Country country;
 
     @NotNull(message = "Phone number is required")
     @Column(nullable = false, unique = true)
