@@ -43,7 +43,6 @@ public class KycService {
         KycProfile kycProfile = new KycProfile();
 
         kycProfile.setUser(user);
-        kycProfile.setDateOfBirth(kycSubmitRequest.getDateOfBirth());
         kycProfile.setIdType(kycSubmitRequest.getIdType());
         kycProfile.setIdNumber(kycSubmitRequest.getIdNumber().trim().toUpperCase());
         kycProfile.setExpiryDate(kycSubmitRequest.getExpiryDate());
@@ -51,7 +50,6 @@ public class KycService {
         kycProfile.setCity(kycSubmitRequest.getCity().trim());
         kycProfile.setState(kycSubmitRequest.getState() != null ? kycSubmitRequest.getState().trim() : null);
         kycProfile.setPostalCode(kycSubmitRequest.getPostalCode().trim());
-        kycProfile.setCountry(kycSubmitRequest.getCountry().trim());
         kycProfile.setStatus(KycStatus.PENDING);
         kycProfile.setSubmittedAt(LocalDateTime.now());
 

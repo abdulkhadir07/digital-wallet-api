@@ -44,6 +44,7 @@ public class AuthService {
         newUser.setFirstName(registerRequest.getFirstName().trim());
         newUser.setLastName(registerRequest.getLastName().trim());
         newUser.setDateOfBirth(registerRequest.getDateOfBirth());
+        newUser.setCountry(registerRequest.getCountry());
         newUser.setPhoneNumber(registerRequest.getPhoneNumber().trim());
         newUser.setEmail(registerRequest.getEmail().trim().toLowerCase());
         newUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));// HASH later

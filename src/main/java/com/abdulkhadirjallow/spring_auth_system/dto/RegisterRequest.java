@@ -1,6 +1,9 @@
 package com.abdulkhadirjallow.spring_auth_system.dto;
 
+import com.abdulkhadirjallow.spring_auth_system.enums.Country;
 import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -21,6 +24,10 @@ public class RegisterRequest {
     @NotNull( message = " Date of birth is required")
     @Column(nullable = false)
     private LocalDate dateOfBirth;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Country country;
 
     @NotNull(message = "Phone Number is required")
     @Column(nullable = false, unique = true)

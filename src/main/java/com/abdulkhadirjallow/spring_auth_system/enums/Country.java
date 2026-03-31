@@ -1,5 +1,10 @@
 package com.abdulkhadirjallow.spring_auth_system.enums;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
 public enum Country {
 
     // North America
@@ -42,8 +47,9 @@ public enum Country {
     // Data fields
     private final Currency defaultCurrency;
     private final Continent continent;
+
     // Constructor
-    Country(Currency defaultCurrency, Continent continent)  {
+    Country (Currency defaultCurrency, Continent continent)  {
         this.defaultCurrency = defaultCurrency;
         this.continent = continent;
     }

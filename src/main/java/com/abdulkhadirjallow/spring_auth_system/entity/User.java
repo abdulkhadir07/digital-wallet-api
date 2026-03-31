@@ -48,7 +48,7 @@ public class User {
     private String phoneNumber;
 
     @Email(message = "Please provide a valid email address")
-    @Column(nullable = true, unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @NotBlank(message = "Password is required")

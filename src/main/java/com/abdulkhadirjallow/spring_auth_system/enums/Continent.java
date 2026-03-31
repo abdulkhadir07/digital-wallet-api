@@ -5,5 +5,4 @@ public enum Continent {
     EUROPE,
     ASIA,
     AFRICA,
-    AUSTRALIA,
 }
