@@ -38,6 +38,10 @@ public class User {
     @Column(nullable = false)
     private LocalDate dateOfBirth;
 
+    @NotBlank(message = "Country is required")
+    @Column(nullable = false)
+    private String country;
+
     @NotNull(message = "Phone number is required")
     @Column(nullable = false, unique = true)
     private String phoneNumber;
