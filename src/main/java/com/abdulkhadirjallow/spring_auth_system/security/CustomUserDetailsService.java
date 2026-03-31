@@ -19,7 +19,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String phoneNumber) throws UsernameNotFoundException {
         User user = userRepository.findByPhoneNumber(phoneNumber.trim())
                 .orElseThrow(() -> new UsernameNotFoundException("Invalid username or password."));
-
         return UserPrincipal.fromUser(user);
     }
 }

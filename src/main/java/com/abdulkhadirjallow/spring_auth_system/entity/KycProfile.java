@@ -30,7 +30,7 @@ public class KycProfile {
 
     // Document Details
     @NotNull(message = "Date of birth is required")
-    private LocalDateTime dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @NotBlank(message = "ID type is required")
     @Column(nullable = false)

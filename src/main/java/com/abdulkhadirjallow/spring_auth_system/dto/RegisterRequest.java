@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
+
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class RegisterRequest {
 
@@ -16,6 +17,10 @@ public class RegisterRequest {
 
     @NotBlank(message = "Last name is required")
     private String lastName;
+
+    @NotNull( message = " Date of birth is required")
+    @Column(nullable = false)
+    private LocalDate dateOfBirth;
 
     @NotNull(message = "Phone Number is required")
     @Column(nullable = false, unique = true)

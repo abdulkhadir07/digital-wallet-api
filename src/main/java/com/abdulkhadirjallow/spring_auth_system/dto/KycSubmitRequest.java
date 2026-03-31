@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -21,7 +20,7 @@ public class KycSubmitRequest {
     //First and last name should be derived from the user registration(user should confirm)
 
     @NotNull(message = "Date of birth is required")
-    private LocalDateTime dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @NotBlank(message = "ID type(Passport, ID Card, Driver's License or Voter's card is required")
     private String idType;

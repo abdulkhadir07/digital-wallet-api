@@ -43,7 +43,7 @@ public class AuthService {
 
         newUser.setFirstName(registerRequest.getFirstName().trim());
         newUser.setLastName(registerRequest.getLastName().trim());
-        /*newUser.setDateOfBirth(registerRequest.getDateOfBirth());*/
+        newUser.setDateOfBirth(registerRequest.getDateOfBirth());
         newUser.setPhoneNumber(registerRequest.getPhoneNumber().trim());
         newUser.setEmail(registerRequest.getEmail().trim().toLowerCase());
         newUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));// HASH later
@@ -100,7 +100,7 @@ public class AuthService {
         }
 
         // check if verification matches
-        if(!user.getVerificationCode().equals(verifyRequest.getVerificationCode().trim())) {
+        if(!user.getVerificationCode().trim().equals(verifyRequest.getVerificationCode().trim())) {
             throw new BadRequestException("Verification code does not match");
         }
 
