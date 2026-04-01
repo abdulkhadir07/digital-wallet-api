@@ -44,6 +44,10 @@ public class Wallet {
     private LocalDateTime updatedAt;
 
     public Wallet(User user) {
+
+        if(user == null || user.getCountry() == null) {
+            throw new IllegalArgumentException("User and country are required");
+        }
         this.user = user;
         this.currency = user.getCountry().getDefaultCurrency();
     }
