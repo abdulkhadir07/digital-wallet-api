@@ -108,12 +108,12 @@ public class WalletService {
 
     // create the transaction history
     private WalletTransaction createTransaction(Wallet wallet,
-                                               TransactionType transactionType,
-                                               TransactionSource transactionSource,
-                                               BigDecimal amount,
-                                               BigDecimal balanceBefore,
-                                               BigDecimal balanceAfter,
-                                               String description) {
+                                                TransactionType transactionType,
+                                                TransactionSource transactionSource,
+                                                BigDecimal amount,
+                                                BigDecimal balanceBefore,
+                                                BigDecimal balanceAfter,
+                                                String description) {
 
 
         WalletTransaction walletTransaction = new WalletTransaction();

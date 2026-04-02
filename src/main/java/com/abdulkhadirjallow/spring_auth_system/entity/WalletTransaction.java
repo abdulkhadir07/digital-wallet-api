@@ -60,9 +60,8 @@ public class WalletTransaction {
         this.createdAt = LocalDateTime.now();
 
         // Generate a random reference Id
-        if(this.reference == null) {
+        if (this.reference == null) {
             this.reference = "TXN-" + java.util.UUID.randomUUID().toString().substring(0,8).toUpperCase();
         }
     }
-
 }
