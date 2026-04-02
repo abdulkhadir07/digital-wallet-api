@@ -52,7 +52,7 @@ public class WalletService {
     }
 
     @Transactional
-    public WalletTransaction debitWallet (Long userId,BigDecimal amount,TransactionSource transactionSource, String description) {
+    public WalletTransaction debitWallet(Long userId,BigDecimal amount,TransactionSource transactionSource, String description) {
 
         Wallet wallet = walletRepository.findByUserIdForUpdate(userId)
                 .orElseThrow(()-> new BadRequestException("User wallet not found"));
@@ -83,7 +83,7 @@ public class WalletService {
     }
 
     @Transactional
-    public WalletTransaction creditWallet (Long userId, BigDecimal amount, TransactionSource transactionSource,String description) {
+    public WalletTransaction creditWallet(Long userId, BigDecimal amount, TransactionSource transactionSource,String description) {
 
         Wallet wallet = walletRepository.findByUserIdForUpdate(userId)
                 .orElseThrow(() -> new BadRequestException("User wallet not found"));
@@ -131,7 +131,7 @@ public class WalletService {
     }
 
     // Load the transaction history
-    public List<WalletTransaction> getTransactionHistory (Long userId) {
+    public List<WalletTransaction> getTransactionHistory(Long userId) {
 
         // load user wallet
         Wallet wallet = walletRepository.findByUserId(userId)

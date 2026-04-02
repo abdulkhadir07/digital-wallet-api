@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class WalletTransactionResponse {
 
-    private  String reference;
+    private String reference;
     private String description;
     private TransactionType transactionType;
     private TransactionStatus transactionStatus;

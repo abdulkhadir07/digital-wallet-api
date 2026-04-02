@@ -8,6 +8,7 @@ import com.abdulkhadirjallow.spring_auth_system.exception.BadRequestException;
 import com.abdulkhadirjallow.spring_auth_system.exception.UnauthorizedException;
 import com.abdulkhadirjallow.spring_auth_system.repository.UserRepository;
 import com.abdulkhadirjallow.spring_auth_system.security.JwtService;
+import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +20,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final WalletService walletService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, WalletService walletService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.walletService = walletService;
     }
 
+    @Transactional
     public void register(RegisterRequest registerRequest) {
 
         // Phone Number Uniqueness (check if phone number already exist)
@@ -55,7 +59,11 @@ public class AuthService {
         newUser.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(10));
 
         // Save to database
-        userRepository.save(newUser);
+        User savedUser = userRepository.save(newUser);
+
+        // Auto-create wallet o=
+        walletService.createWallet(savedUser.getId());
+
         System.out.println("Verification code for " + newUser.getPhoneNumber() + ": " + code);
     }
 
