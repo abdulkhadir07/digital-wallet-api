@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface KycProfileRepository extends JpaRepository<KycProfile, Long> {
 
     // Find a Kyc profile by the user Object
-    Optional<KycProfile> findByUser(User user);
+    Optional<KycProfile> findByUserId(Long userId);
 
     // Check if user is already Kyc verified
     boolean existsByUser(User user);

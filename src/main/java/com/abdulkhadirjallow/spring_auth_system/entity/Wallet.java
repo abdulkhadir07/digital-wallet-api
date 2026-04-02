@@ -31,11 +31,11 @@ public class Wallet {
     private Currency currency;
 
     @Column(nullable = false, precision = 18, scale = 4)
-    private BigDecimal balance = BigDecimal.ZERO;
+    private BigDecimal balance;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private WalletStatus walletStatus = WalletStatus.ACTIVE;
+    private WalletStatus walletStatus;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -50,6 +50,8 @@ public class Wallet {
         }
         this.user = user;
         this.currency = user.getCountry().getDefaultCurrency();
+        this.balance = BigDecimal.ZERO;
+        this.walletStatus = WalletStatus.ACTIVE;
     }
 
     @PrePersist
