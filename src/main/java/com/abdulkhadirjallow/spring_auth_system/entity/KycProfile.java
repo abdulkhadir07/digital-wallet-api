@@ -29,8 +29,6 @@ public class KycProfile {
     private User user;
 
     // Document Details
-    @NotNull(message = "Date of birth is required")
-    private LocalDate dateOfBirth;
 
     @NotBlank(message = "ID type is required")
     @Column(nullable = false)
@@ -59,10 +57,6 @@ public class KycProfile {
     @NotBlank(message = "Postal Code is required")
     @Column(nullable = false)
     private String postalCode;
-
-    @NotBlank(message ="Country is required")
-    @Column(nullable = false)
-    private String country;
 
     // Files (URLs to secure storage)
     private String idFrontImageUrl;

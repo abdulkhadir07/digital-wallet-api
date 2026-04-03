@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/kyc")
 public class KycController {
 
-
-
     private final KycService kycService;
 
     public KycController(KycService kycService) {
@@ -28,7 +26,6 @@ public class KycController {
 
     @PostMapping("/submit")
     public ResponseEntity<KycResponse> submitKyc(
-
             @RequestBody @Valid KycSubmitRequest kycSubmitRequest,
             @AuthenticationPrincipal UserPrincipal principal
     ) {
