@@ -34,11 +34,10 @@ public class RegisterRequest {
     private String phoneNumber;
 
     @Email(message = "Please enter a valid email address")
-    @Column(nullable = true, unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @NotBlank(message = "Password is required")
     @Size(min = 8, max = 30, message = "Password must be at least 8 characters!")
     private String password;
-
 }

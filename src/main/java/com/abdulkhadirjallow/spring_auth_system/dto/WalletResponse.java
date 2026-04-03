@@ -20,5 +20,6 @@ public class WalletResponse {
     private BigDecimal balance;
     private WalletStatus walletStatus;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
 }

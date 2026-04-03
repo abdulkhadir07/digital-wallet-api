@@ -36,7 +36,7 @@ public class WalletController {
         return new ResponseEntity<>(toWalletResponse(wallet),HttpStatus.OK);
     }
 
-    @GetMapping("/history")
+    @GetMapping("/transactions")
     public ResponseEntity<List<WalletTransactionResponse>> transactionHistory(@AuthenticationPrincipal UserPrincipal principal) {
 
         // get authenticated user id
@@ -93,7 +93,8 @@ public class WalletController {
                 wallet.getCurrency(),
                 wallet.getBalance(),
                 wallet.getWalletStatus(),
-                wallet.getCreatedAt()
+                wallet.getCreatedAt(),
+                wallet.getUpdatedAt()
         );
     }
 }
