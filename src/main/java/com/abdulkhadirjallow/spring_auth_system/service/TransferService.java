@@ -12,7 +12,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-
+import java.util.List;
 
 @Service
 public class TransferService {
@@ -116,12 +116,43 @@ public class TransferService {
         return transferRepository.save(transfer);
     }
 
+    public List<Transfer> transferHistory(Long userId) {
+        // get all transfers for a specific user
+        return transferRepository.findAllByUserId(userId);
+    }
+
+    public Transfer getTransferByReference(String reference, Long userId) {
+
+        // find transfer by reference
+        Transfer transfer = transferRepository.findByReference(reference)
+                .orElseThrow(() -> new BadRequestException("Reference not found"));
+
+
+        // ownership check
+        if (!transfer.getSenderUser().getId().equals(userId) && !transfer.getRecipientUser().getId().equals(userId)) {
+            throw new BadRequestException("You cannot transfer money to yourself");
+        }
+        // return transfer by reference
+       return transfer;
+    }
+
+    public List<Transfer> getTransferSent(Long senderUserId) {
+        // return all transfers sent by user
+        return transferRepository.findBySenderUserIdOrderByCreatedAtDesc(senderUserId);
+    }
+
+    public List<Transfer> getTransferReceived(Long recipientUserId) {
+
+        // return all transfers received by user
+        return transferRepository.findByRecipientUserIdOrderByCreatedAtDesc(recipientUserId);
+    }
+
     // helper methods
     // Recipient lookup
     private User findRecipient(String phoneNumber) {
 
         // find user(recipient)
-       return userRepository.findByPhoneNumber(phoneNumber)
+       return userRepository.findByPhoneNumber(phoneNumber.trim())
                 .orElseThrow(() -> new BadRequestException("Recipient not found"));
     }
 
@@ -129,7 +160,7 @@ public class TransferService {
 
         // check if user is Kyc verified
         if (kycProfile.getStatus() != KycStatus.VERIFIED ) {
-            throw new BadRequestException("Please verify your identity to send amounts greater than $200");
+            throw new BadRequestException("Please verify your identity to send amounts of $200 and above");
         }
     }
 
@@ -152,5 +183,4 @@ public class TransferService {
     private BigDecimal stubExchangeRate() {
         return BigDecimal.ONE;
     }
-
 }
