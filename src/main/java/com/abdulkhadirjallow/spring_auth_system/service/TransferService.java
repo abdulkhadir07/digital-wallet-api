@@ -1,0 +1,156 @@
+package com.abdulkhadirjallow.spring_auth_system.service;
+
+import com.abdulkhadirjallow.spring_auth_system.dto.TransferRequest;
+import com.abdulkhadirjallow.spring_auth_system.entity.*;
+import com.abdulkhadirjallow.spring_auth_system.enums.*;
+import com.abdulkhadirjallow.spring_auth_system.exception.BadRequestException;
+import com.abdulkhadirjallow.spring_auth_system.repository.KycProfileRepository;
+import com.abdulkhadirjallow.spring_auth_system.repository.TransferRepository;
+import com.abdulkhadirjallow.spring_auth_system.repository.UserRepository;
+import com.abdulkhadirjallow.spring_auth_system.repository.WalletRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+
+
+@Service
+public class TransferService {
+
+    private final TransferRepository transferRepository;
+    private final UserRepository userRepository;
+    private final KycProfileRepository kycProfileRepository;
+    private final WalletRepository walletRepository;
+    private final WalletService walletService;
+
+    public TransferService(TransferRepository transferRepository,
+                           UserRepository userRepository,
+                           KycProfileRepository kycProfileRepository,
+                           WalletRepository walletRepository,
+                           WalletService walletService) {
+        this.transferRepository = transferRepository;
+        this.userRepository = userRepository;
+        this.kycProfileRepository = kycProfileRepository;
+        this.walletRepository = walletRepository;
+        this.walletService = walletService;
+    }
+
+    // create transfer
+    @Transactional
+    public Transfer transfer(Long userId, TransferRequest transferRequest) {
+
+        // find user(sender)
+        User senderUser = userRepository.findById(userId)
+                .orElseThrow(() -> new BadRequestException("User not found"));
+
+        // find user(recipient)
+        User recipient = findRecipient(transferRequest.getRecipientPhoneNumber());
+
+        // self-transfer check
+        if (senderUser.getId().equals(recipient.getId())) {
+            throw new BadRequestException("You are not allowed to transfer yourself");
+        }
+
+        // find the senderWallet
+        Wallet senderWallet = walletRepository.findByUserId(senderUser.getId())
+                .orElseThrow(() -> new BadRequestException("Sender wallet not found"));
+
+        // find the receiverWallet
+        Wallet recipientWallet = walletRepository.findByUserId(recipient.getId())
+                .orElseThrow(() -> new BadRequestException("Recipient wallet not found"));
+
+        // calculate the total fees
+        BigDecimal totalFees = calculateFee(
+                transferRequest.getSenderAmount(),
+                senderWallet.getCurrency(),
+                recipientWallet.getCurrency(),
+                senderUser.getCountry(),
+                recipient.getCountry()
+        );
+
+        // check if sender balance is enough to cover sendAmount + fee
+        if (senderWallet.getBalance().compareTo(transferRequest.getSenderAmount().add(totalFees)) < 0) {
+            throw new BadRequestException("You have insufficient funds");
+        }
+
+        // Check KYC status only if senderAmount is greater than or equal to 200
+        BigDecimal limit = new BigDecimal("200.00");
+        if (transferRequest.getSenderAmount().compareTo(limit) >= 0) {
+            KycProfile kycProfile = kycProfileRepository.findByUserId(senderUser.getId())
+                    .orElseThrow(() -> new BadRequestException("KYC verified is required for transfers $200 and above"));
+
+            validateKycRequirements(kycProfile);
+        }
+
+        // calculate recipientAmount
+        BigDecimal recipientAmount;
+        BigDecimal exchangeRate = stubExchangeRate();
+
+        if(senderUser.getCountry().equals(recipient.getCountry()) || senderWallet.getCurrency().equals(recipientWallet.getCurrency())) {
+            recipientAmount = transferRequest.getSenderAmount();
+        } else  {
+             recipientAmount = transferRequest.getSenderAmount().multiply(exchangeRate);
+        }
+
+        // debit senderUser and credit recipient accordingly
+        BigDecimal totalDebitAmount = transferRequest.getSenderAmount().add(totalFees);
+        walletService.debitWallet(senderUser.getId(),totalDebitAmount, TransactionSource.TRANSFER,transferRequest.getDescription());
+        walletService.creditWallet(recipient.getId(), recipientAmount, TransactionSource.TRANSFER,transferRequest.getDescription());
+
+        // Map request DTO to entity
+        Transfer transfer = new Transfer();
+
+        transfer.setSenderUser(senderUser);
+        transfer.setRecipientUser(recipient);
+        transfer.setSenderWallet(senderWallet);
+        transfer.setRecipientWallet(recipientWallet);
+        transfer.setSenderCurrency(senderWallet.getCurrency());
+        transfer.setRecipientCurrency(recipientWallet.getCurrency());
+        transfer.setSenderAmount(transferRequest.getSenderAmount());
+        transfer.setRecipientAmount(recipientAmount);
+        transfer.setFee(totalFees);
+        transfer.setExchangeRate(exchangeRate);
+        transfer.setDescription(transferRequest.getDescription());
+        transfer.setTransferStatus(TransferStatus.COMPLETED);
+
+        return transferRepository.save(transfer);
+    }
+
+    // helper methods
+    // Recipient lookup
+    private User findRecipient(String phoneNumber) {
+
+        // find user(recipient)
+       return userRepository.findByPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new BadRequestException("Recipient not found"));
+    }
+
+    private void validateKycRequirements(KycProfile kycProfile) {
+
+        // check if user is Kyc verified
+        if (kycProfile.getStatus() != KycStatus.VERIFIED ) {
+            throw new BadRequestException("Please verify your identity to send amounts greater than $200");
+        }
+    }
+
+    private BigDecimal calculateFee(BigDecimal senderAmount, Currency senderCurrency, Currency recipientCurrency, Country senderCountry, Country recipientCountry) {
+
+        // Domestic transfer fees
+        if(senderCountry == recipientCountry) {
+            return BigDecimal.ZERO;
+        }
+
+        // Same currency but different countries transfer fees
+        if(senderCurrency == recipientCurrency) {
+            return senderAmount.multiply(new BigDecimal("0.01"));
+        }
+
+        // All international transfers (different currencies) transfer fees
+        return senderAmount.multiply(new BigDecimal("0.02"));
+    }
+
+    private BigDecimal stubExchangeRate() {
+        return BigDecimal.ONE;
+    }
+
+}

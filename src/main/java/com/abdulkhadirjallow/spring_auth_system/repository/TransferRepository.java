@@ -8,11 +8,13 @@ import java.util.Optional;
 
 public interface TransferRepository extends JpaRepository<Transfer, Long> {
 
+    // return a specific reference for a specific user
     Optional<Transfer> findByReference(String reference);
+    Optional<Transfer> findBySenderUserId(Long senderUserId);
 
     // return all transfers for a specific user
-    List<Transfer> findBySenderUserIdOrderByCreatedAtDesc(Long userId);
-    List<Transfer> findByRecipientUserIdOrderByCreatedAtDesc(Long userId);
+    List<Transfer> findBySenderUserIdOrderByCreatedAtDesc(Long senderUserId);
+    List<Transfer> findByRecipientUserIdOrderByCreatedAtDesc(Long recipientUserId);
 
     // check if a specific reference exist
     boolean existsByReference(String reference);
