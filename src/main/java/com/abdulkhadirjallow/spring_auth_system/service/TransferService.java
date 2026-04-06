@@ -22,17 +22,19 @@ public class TransferService {
     private final KycProfileRepository kycProfileRepository;
     private final WalletRepository walletRepository;
     private final WalletService walletService;
+    private final FxRateService fxRateService;
 
     public TransferService(TransferRepository transferRepository,
                            UserRepository userRepository,
                            KycProfileRepository kycProfileRepository,
                            WalletRepository walletRepository,
-                           WalletService walletService) {
+                           WalletService walletService, FxRateService fxRateService) {
         this.transferRepository = transferRepository;
         this.userRepository = userRepository;
         this.kycProfileRepository = kycProfileRepository;
         this.walletRepository = walletRepository;
         this.walletService = walletService;
+        this.fxRateService = fxRateService;
     }
 
     // create transfer
@@ -84,7 +86,7 @@ public class TransferService {
 
         // calculate recipientAmount
         BigDecimal recipientAmount;
-        BigDecimal exchangeRate = stubExchangeRate();
+        BigDecimal exchangeRate = fxRateService.getExchangeRate(senderWallet.getCurrency(), recipientWallet.getCurrency());
 
         if(senderUser.getCountry().equals(recipient.getCountry()) || senderWallet.getCurrency().equals(recipientWallet.getCurrency())) {
             recipientAmount = transferRequest.getSenderAmount();
@@ -178,9 +180,5 @@ public class TransferService {
 
         // All international transfers (different currencies) transfer fees
         return senderAmount.multiply(new BigDecimal("0.02"));
-    }
-
-    private BigDecimal stubExchangeRate() {
-        return BigDecimal.ONE;
     }
 }
