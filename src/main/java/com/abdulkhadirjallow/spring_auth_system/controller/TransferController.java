@@ -1,6 +1,7 @@
 package com.abdulkhadirjallow.spring_auth_system.controller;
 
 import com.abdulkhadirjallow.spring_auth_system.dto.RecipientInfo;
+import com.abdulkhadirjallow.spring_auth_system.dto.SenderInfo;
 import com.abdulkhadirjallow.spring_auth_system.dto.TransferRequest;
 import com.abdulkhadirjallow.spring_auth_system.dto.TransferResponse;
 import com.abdulkhadirjallow.spring_auth_system.entity.Transfer;
@@ -31,11 +32,12 @@ public class TransferController {
 
         // call service to apply logic
         Transfer transfer = transferService.transfer(userId, transferRequest);
-        TransferResponse transferResponse = new TransferResponse();
+
+        TransferResponse transferResponse = toTransferResponse(transfer);
         transferResponse.setMessage("Your transfer has been sent successfully");
 
         // return response
-        return new ResponseEntity<>(toTransferResponse(transfer),HttpStatus.CREATED);
+        return new ResponseEntity<>(transferResponse,HttpStatus.CREATED);
     }
 
     @GetMapping("/history")
@@ -108,6 +110,8 @@ public class TransferController {
                 transfer.getReference(),
                 transfer.getTransferStatus(),
                 null,
+                transfer.getDescription(),
+                SenderInfo.from(transfer.getSenderUser()),
                 transfer.getSenderAmount(),
                 transfer.getRecipientAmount(),
                 transfer.getFee(),
