@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Service
@@ -70,16 +71,11 @@ public class TransferService {
                 recipient.getCountry()
         );
 
-        // check if sender balance is enough to cover sendAmount + fee
-        if (senderWallet.getBalance().compareTo(transferRequest.getSenderAmount().add(totalFees)) < 0) {
-            throw new BadRequestException("You have insufficient funds");
-        }
-
         // Check KYC status only if senderAmount is greater than or equal to 200
         BigDecimal limit = new BigDecimal("200.00");
         if (transferRequest.getSenderAmount().compareTo(limit) >= 0) {
             KycProfile kycProfile = kycProfileRepository.findByUserId(senderUser.getId())
-                    .orElseThrow(() -> new BadRequestException("KYC verified is required for transfers $200 and above"));
+                    .orElseThrow(() -> new BadRequestException("KYC verification is required for transfers $200 and above"));
 
             validateKycRequirements(kycProfile);
         }
@@ -87,11 +83,17 @@ public class TransferService {
         // calculate recipientAmount
         BigDecimal recipientAmount;
         BigDecimal exchangeRate = fxRateService.getExchangeRate(senderWallet.getCurrency(), recipientWallet.getCurrency());
+        BigDecimal retailRate = exchangeRate.multiply(new BigDecimal("0.995")).setScale(4, RoundingMode.HALF_DOWN);
 
         if(senderUser.getCountry().equals(recipient.getCountry()) || senderWallet.getCurrency().equals(recipientWallet.getCurrency())) {
             recipientAmount = transferRequest.getSenderAmount();
         } else  {
-             recipientAmount = transferRequest.getSenderAmount().multiply(exchangeRate);
+             recipientAmount = transferRequest.getSenderAmount().multiply(retailRate).setScale(2, RoundingMode.HALF_DOWN);
+        }
+
+        // check if sender balance is enough to cover sendAmount + fee
+        if (senderWallet.getBalance().compareTo(transferRequest.getSenderAmount().add(totalFees)) < 0) {
+            throw new BadRequestException("You have insufficient funds");
         }
 
         // debit senderUser and credit recipient accordingly
@@ -173,12 +175,12 @@ public class TransferService {
             return BigDecimal.ZERO;
         }
 
-        // Same currency but different countries transfer fees
+        // Same currency but different countries transfer fees @1%
         if(senderCurrency == recipientCurrency) {
             return senderAmount.multiply(new BigDecimal("0.01"));
         }
 
-        // All international transfers (different currencies) transfer fees
-        return senderAmount.multiply(new BigDecimal("0.02"));
+        // All international transfers (different currencies) fee @0.00
+        return BigDecimal.ZERO;
     }
 }
