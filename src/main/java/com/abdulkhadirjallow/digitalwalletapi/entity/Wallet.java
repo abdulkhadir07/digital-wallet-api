@@ -50,7 +50,10 @@ public class Wallet {
         }
         this.user = user;
         this.currency = user.getCountry().getDefaultCurrency();
-        this.balance = BigDecimal.ZERO;
+
+        //DEV ONLY: initialize with default balance for testing purposes only
+        this.balance = new BigDecimal("1000.00");
+
         this.walletStatus = WalletStatus.ACTIVE;
     }
 
