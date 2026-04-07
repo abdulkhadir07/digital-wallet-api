@@ -24,10 +24,10 @@ public class AuthController {
     public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest reg) {
 
         // Call service to do the logic
-        authService.register(reg);
+        /*authService.register(reg);*/
 
         // Create the response object
-        RegisterResponse registerResponse = new RegisterResponse("User registered successfully. Please verify your phone number.");
+        RegisterResponse registerResponse = authService.register(reg);
 
         // Return the response with 201 status
         return new ResponseEntity<>(registerResponse, HttpStatus.CREATED);
