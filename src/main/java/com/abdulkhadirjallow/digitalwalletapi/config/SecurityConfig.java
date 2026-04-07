@@ -33,7 +33,9 @@ public class SecurityConfig {
                     .httpBasic(httpBasic -> httpBasic.disable())
                     .formLogin(form -> form.disable())
                     .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/auth/register", "/auth/login", "/auth/verify").permitAll()// Anyone can register
+                            .requestMatchers("/auth/register", "/auth/login", "/auth/verify","/v3/api-docs/**",
+                                    "/swagger-ui/**",
+                                    "/swagger-ui.html").permitAll()// Anyone can register
                             .anyRequest().authenticated() // Everything else is locked down
                     ).sessionManagement(session -> session
                             .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // We use JWT, not Cookies
