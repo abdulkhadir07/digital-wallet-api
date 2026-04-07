@@ -21,20 +21,17 @@ public class RegisterRequest {
     @NotBlank(message = "Last name is required")
     private String lastName;
 
-    @NotNull( message = " Date of birth is required")
-    @Column(nullable = false)
+    @NotNull( message = "Date of birth is required")
     private LocalDate dateOfBirth;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @NotNull(message = "Country is required")
     private Country country;
 
-    @NotNull(message = "Phone Number is required")
-    @Column(nullable = false, unique = true)
+    @NotBlank(message = "Phone Number is required")
     private String phoneNumber;
 
     @Email(message = "Please enter a valid email address")
-    @Column(nullable = false, unique = true)
+    @NotBlank(message = "Email is required")
     private String email;
 
     @NotBlank(message = "Password is required")
