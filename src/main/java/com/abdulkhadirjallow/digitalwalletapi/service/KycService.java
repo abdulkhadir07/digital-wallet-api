@@ -50,7 +50,7 @@ public class KycService {
         kycProfile.setCity(kycSubmitRequest.getCity().trim());
         kycProfile.setState(kycSubmitRequest.getState() != null ? kycSubmitRequest.getState().trim() : null);
         kycProfile.setPostalCode(kycSubmitRequest.getPostalCode().trim());
-        kycProfile.setStatus(KycStatus.PENDING);
+        kycProfile.setStatus(KycStatus.VERIFIED);
         kycProfile.setSubmittedAt(LocalDateTime.now());
 
         // Save to Database

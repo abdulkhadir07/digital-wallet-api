@@ -29,32 +29,24 @@ public class KycProfile {
     private User user;
 
     // Document Details
-
-    @NotBlank(message = "ID type is required")
     @Column(nullable = false)
     private String idType; // PASSPORT, ID CARD, DRIVER'S LICENSE, VOTER'S CARD
 
-    @NotBlank(message = " ID number is required")
     @Column(nullable = false, unique = true)
     private String idNumber; // Encrypt this
 
-    @NotNull(message = "Expiry date is required")
     @Column(nullable = false)
     private LocalDate expiryDate;
 
     // Structured Address (Required for Global Remittance)
-    @NotBlank(message = " Street address is required")
     @Column(nullable = false)
     private String streetAddress;
 
-    @NotBlank(message = "City is required")
     @Column(nullable = false)
     private String city;
 
-    @Column(nullable = true)
     private String state;
 
-    @NotBlank(message = "Postal Code is required")
     @Column(nullable = false)
     private String postalCode;
 

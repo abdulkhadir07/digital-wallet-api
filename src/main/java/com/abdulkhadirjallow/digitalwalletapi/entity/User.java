@@ -25,17 +25,14 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "First name is required")
     @Size( max = 30)
     @Column(nullable = false, length = 30)
     private String firstName;
 
-    @NotBlank(message = "Last name is required")
     @Size( max = 30)
     @Column(nullable = false, length = 30)
     private String lastName;
 
-    @NotNull( message = " Date of birth is required")
     @Column(nullable = false)
     private LocalDate dateOfBirth;
 
@@ -43,15 +40,12 @@ public class User {
     @Column(nullable = false)
     private Country country;
 
-    @NotNull(message = "Phone number is required")
     @Column(nullable = false, unique = true)
     private String phoneNumber;
 
-    @Email(message = "Please provide a valid email address")
     @Column(nullable = false, unique = true)
     private String email;
 
-    @NotBlank(message = "Password is required")
     @Column(nullable = false)
     private String password;
 

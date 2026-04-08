@@ -38,7 +38,7 @@ public class KycController {
 
         // create the response entity
         KycResponse kycResponse = new KycResponse(
-                "KYC submitted and under review",
+                "Thank you submitting your KYC. Your status has been adjusted",
                 savedKyc.getStatus(),
                 savedKyc.getSubmittedAt());
 

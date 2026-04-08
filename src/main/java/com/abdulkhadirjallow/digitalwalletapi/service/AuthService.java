@@ -2,6 +2,7 @@ package com.abdulkhadirjallow.digitalwalletapi.service;
 
 import com.abdulkhadirjallow.digitalwalletapi.dto.LoginRequest;
 import com.abdulkhadirjallow.digitalwalletapi.dto.RegisterRequest;
+import com.abdulkhadirjallow.digitalwalletapi.dto.RegisterResponse;
 import com.abdulkhadirjallow.digitalwalletapi.dto.VerifyRequest;
 import com.abdulkhadirjallow.digitalwalletapi.entity.User;
 import com.abdulkhadirjallow.digitalwalletapi.exception.BadRequestException;
@@ -30,7 +31,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void register(RegisterRequest registerRequest) {
+    public RegisterResponse register(RegisterRequest registerRequest) {
 
         // Phone Number Uniqueness (check if phone number already exist)
         if (userRepository.existsByPhoneNumber(registerRequest.getPhoneNumber().trim())) {
@@ -64,7 +65,10 @@ public class AuthService {
         // Auto-create wallet o=
         walletService.createWallet(savedUser.getId());
 
-        System.out.println("Verification code for " + newUser.getPhoneNumber() + ": " + code);
+        // temporary for testing only
+        return new RegisterResponse("User registered successfully. Please verify your phone number", code);
+
+        /*System.out.println("Verification code for " + newUser.getPhoneNumber() + ": " + code);*/
     }
 
     public String login(LoginRequest loginRequest) {
