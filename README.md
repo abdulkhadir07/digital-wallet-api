@@ -29,7 +29,7 @@ A RESTful API for a digital wallet platform supporting multi-currency transfers,
   - [Wallet](#wallet)
   - [Transfers](#transfers)
   - [Kyc](#kyc)
-- [Testing the api](#testing-the-api)
+- [Testing the API](#testing-the-API)
 - [Transfer Price Model](#transfer-pricing-model)
 - [KYC Verification](#kyc-verification)
 - [Project Structure](#project-structure)
@@ -193,7 +193,7 @@ POST /transfer/send
 
 ```json
 {
-  "reference": "TRF-0001",
+  "reference": "TRF-000CD09H1",
   "transferStatus": "COMPLETED",
   "message": "Your transfer has been successfully sent",
   "description": "Rent split",
