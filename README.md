@@ -36,7 +36,7 @@ A RESTful API for a digital wallet platform supporting multi-currency transfers,
 
 ---
 
-## 🧠 Features
+## Features
 
 - **User registration & login** with JWT authentication
 - **Automatic wallet creation** in the user's native currency on registration
@@ -50,7 +50,7 @@ A RESTful API for a digital wallet platform supporting multi-currency transfers,
 
 ---
 
-## 🏗️ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -106,7 +106,7 @@ FX_API_KEY=your_exchangerate_api_key
 FX_API_URL=https://v6.exchangerate-api.com/v6
 ```
 
-## 📦 Running Locally
+## Running Locally
 
 ```bash
 # Clone the repo
@@ -134,20 +134,20 @@ All protected endpoints require a Bearer token in the `Authorization` header:
 Authorization: Bearer <your_jwt_token>
 ```
 
-## 🔑 Authentication
+## Authentication
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
 | `POST` | `/auth/register` | ❌ | Register a new user (wallet auto-created) |
 | `POST` | `/auth/login` | ❌ | Login and receive JWT token |
 
-## 💳 Wallet
+## Wallet
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
 | `GET` | `/wallet` | ✅ | Get current user's wallet balance |
 
-## 💸 Transfers
+## Transfers
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
@@ -157,7 +157,7 @@ Authorization: Bearer <your_jwt_token>
 | `GET` | `/transfer/sent` | ✅ | Transfers sent by current user |
 | `GET` | `/transfer/received` | ✅ | Transfers received by current user |
 
-## 🧪 Testing the API
+## Testing the API
 
 Use Swagger UI:
 
