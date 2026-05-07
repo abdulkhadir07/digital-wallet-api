@@ -29,7 +29,14 @@ public class SecurityConfig {
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
             http
                     .csrf(csrf -> csrf.disable())// Disable CSRF for stateless APIs
-                    .cors(cors -> cors.disable())
+                    .cors(cors -> cors.configurationSource(request -> {
+                        var config = new org.springframework.web.cors.CorsConfiguration();
+                        config.setAllowedOriginPatterns(java.util.List.of("*"));
+                        config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+                        config.setAllowedHeaders(java.util.List.of("*"));
+                        config.setAllowCredentials(true);
+                        return config;
+                    }))
                     .httpBasic(httpBasic -> httpBasic.disable())
                     .formLogin(form -> form.disable())
                     .authorizeHttpRequests(auth -> auth
