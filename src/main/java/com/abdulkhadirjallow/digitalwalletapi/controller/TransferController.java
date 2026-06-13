@@ -1,9 +1,6 @@
 package com.abdulkhadirjallow.digitalwalletapi.controller;
 
-import com.abdulkhadirjallow.digitalwalletapi.dto.RecipientInfo;
-import com.abdulkhadirjallow.digitalwalletapi.dto.SenderInfo;
-import com.abdulkhadirjallow.digitalwalletapi.dto.TransferRequest;
-import com.abdulkhadirjallow.digitalwalletapi.dto.TransferResponse;
+import com.abdulkhadirjallow.digitalwalletapi.dto.*;
 import com.abdulkhadirjallow.digitalwalletapi.entity.Transfer;
 import com.abdulkhadirjallow.digitalwalletapi.security.UserPrincipal;
 import com.abdulkhadirjallow.digitalwalletapi.service.TransferService;
@@ -38,6 +35,14 @@ public class TransferController {
 
         // return response
         return new ResponseEntity<>(transferResponse,HttpStatus.CREATED);
+    }
+
+    @PostMapping("/quote")
+    public ResponseEntity<TransferQuoteResponse> quote(@AuthenticationPrincipal UserPrincipal principal, @Valid @RequestBody TransferQuoteRequest transferQuoteRequest) {
+
+        Long userId = principal.getUserId();
+        TransferQuoteResponse quote = transferService.quoteTransfer(userId, transferQuoteRequest);
+        return new ResponseEntity<>(quote, HttpStatus.OK);
     }
 
     @GetMapping("/history")
