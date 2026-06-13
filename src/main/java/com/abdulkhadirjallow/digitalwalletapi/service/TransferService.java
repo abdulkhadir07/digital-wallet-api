@@ -1,5 +1,8 @@
 package com.abdulkhadirjallow.digitalwalletapi.service;
 
+import com.abdulkhadirjallow.digitalwalletapi.dto.RecipientInfo;
+import com.abdulkhadirjallow.digitalwalletapi.dto.TransferQuoteRequest;
+import com.abdulkhadirjallow.digitalwalletapi.dto.TransferQuoteResponse;
 import com.abdulkhadirjallow.digitalwalletapi.dto.TransferRequest;
 import com.abdulkhadirjallow.digitalwalletapi.entity.*;
 import com.abdulkhadirjallow.digitalwalletapi.enums.*;
@@ -62,8 +65,8 @@ public class TransferService {
         Wallet recipientWallet = walletRepository.findByUserId(recipient.getId())
                 .orElseThrow(() -> new BadRequestException("Recipient wallet not found"));
 
-        // calculate the total fees
-        BigDecimal totalFees = calculateFee(
+        // calculate transfer fee, FX rate, recipient amount, and total debit
+        TransferCalculation calculation = calculateTransfer(
                 transferRequest.getSenderAmount(),
                 senderWallet.getCurrency(),
                 recipientWallet.getCurrency(),
@@ -79,27 +82,25 @@ public class TransferService {
 
             validateKycRequirements(kycProfile);
         }
-
-        // calculate recipientAmount
-        BigDecimal recipientAmount;
-        BigDecimal exchangeRate = fxRateService.getExchangeRate(senderWallet.getCurrency(), recipientWallet.getCurrency());
-        BigDecimal retailRate = exchangeRate.multiply(new BigDecimal("0.995")).setScale(4, RoundingMode.HALF_DOWN);
-
-        if(senderUser.getCountry().equals(recipient.getCountry()) || senderWallet.getCurrency().equals(recipientWallet.getCurrency())) {
-            recipientAmount = transferRequest.getSenderAmount();
-        } else  {
-             recipientAmount = transferRequest.getSenderAmount().multiply(retailRate).setScale(2, RoundingMode.HALF_DOWN);
-        }
-
         // check if sender balance is enough to cover sendAmount + fee
-        if (senderWallet.getBalance().compareTo(transferRequest.getSenderAmount().add(totalFees)) < 0) {
+        if (senderWallet.getBalance().compareTo(calculation.totalDebitAmount) < 0) {
             throw new BadRequestException("You have insufficient funds");
         }
 
-        // debit senderUser and credit recipient accordingly
-        BigDecimal totalDebitAmount = transferRequest.getSenderAmount().add(totalFees);
-        walletService.debitWallet(senderUser.getId(),totalDebitAmount, TransactionSource.TRANSFER,transferRequest.getDescription());
-        walletService.creditWallet(recipient.getId(), recipientAmount, TransactionSource.TRANSFER,transferRequest.getDescription());
+        // debit sender and credit recipient
+        walletService.debitWallet(
+                senderUser.getId(),
+                calculation.totalDebitAmount,
+                TransactionSource.TRANSFER,
+                transferRequest.getDescription()
+        );
+
+        walletService.creditWallet(
+                recipient.getId(),
+                calculation.recipientAmount,
+                TransactionSource.TRANSFER,
+                transferRequest.getDescription()
+        );
 
         // Map request DTO to entity
         Transfer transfer = new Transfer();
@@ -111,13 +112,55 @@ public class TransferService {
         transfer.setSenderCurrency(senderWallet.getCurrency());
         transfer.setRecipientCurrency(recipientWallet.getCurrency());
         transfer.setSenderAmount(transferRequest.getSenderAmount());
-        transfer.setRecipientAmount(recipientAmount);
-        transfer.setFee(totalFees);
-        transfer.setExchangeRate(exchangeRate);
+        transfer.setRecipientAmount(calculation.recipientAmount);
+        transfer.setFee(calculation.fee);
+        transfer.setExchangeRate(calculation.exchangeRate);
         transfer.setDescription(transferRequest.getDescription());
         transfer.setTransferStatus(TransferStatus.COMPLETED);
 
         return transferRepository.save(transfer);
+    }
+
+    public TransferQuoteResponse quoteTransfer(Long userId, TransferQuoteRequest transferQuoteRequest) {
+
+        User senderUser = userRepository.findById(userId)
+                .orElseThrow(() -> new BadRequestException("User not found"));
+
+        User recipient = findRecipient(transferQuoteRequest.getRecipientPhoneNumber());
+
+        if (senderUser.getId().equals(recipient.getId())) {
+            throw new BadRequestException("You are not allowed to transfer yourself");
+        }
+
+        Wallet senderWallet = walletRepository.findByUserId(senderUser.getId())
+                .orElseThrow(() -> new BadRequestException("Sender wallet not found"));
+
+        Wallet recipientWallet = walletRepository.findByUserId(recipient.getId())
+                .orElseThrow(() -> new BadRequestException("Recipient wallet not found"));
+
+        TransferCalculation calculation = calculateTransfer(
+                transferQuoteRequest.getSenderAmount(),
+                senderWallet.getCurrency(),
+                recipientWallet.getCurrency(),
+                senderUser.getCountry(),
+                recipient.getCountry()
+        );
+
+        return new TransferQuoteResponse(
+                recipient.getPhoneNumber(),
+                RecipientInfo.from(recipient),
+                transferQuoteRequest.getSenderAmount(),
+                calculation.recipientAmount,
+                calculation.fee,
+                calculation.totalDebitAmount,
+                calculation.exchangeRate,
+                calculation.retailRate,
+                calculation.fxMarkupPercent,
+                senderWallet.getCurrency(),
+                recipientWallet.getCurrency(),
+                calculation.transferType,
+                "Transfer quote generated successfully"
+        );
     }
 
     public List<Transfer> transferHistory(Long userId) {
@@ -130,7 +173,6 @@ public class TransferService {
         // find transfer by reference
         Transfer transfer = transferRepository.findByReference(reference)
                 .orElseThrow(() -> new BadRequestException("Reference not found"));
-
 
         // ownership check
         if (!transfer.getSenderUser().getId().equals(userId) && !transfer.getRecipientUser().getId().equals(userId)) {
@@ -168,19 +210,74 @@ public class TransferService {
         }
     }
 
-    private BigDecimal calculateFee(BigDecimal senderAmount, Currency senderCurrency, Currency recipientCurrency, Country senderCountry, Country recipientCountry) {
+    private static class TransferCalculation {
+        private final BigDecimal fee;
+        private final BigDecimal exchangeRate;
+        private final BigDecimal retailRate;
+        private final BigDecimal recipientAmount;
+        private final BigDecimal totalDebitAmount;
+        private final BigDecimal fxMarkupPercent;
+        private final TransferType transferType;
 
-        // Domestic transfer fees
-        if(senderCountry == recipientCountry) {
-            return BigDecimal.ZERO;
+        private TransferCalculation(
+                BigDecimal fee,
+                BigDecimal exchangeRate,
+                BigDecimal retailRate,
+                BigDecimal recipientAmount,
+                BigDecimal totalDebitAmount,
+                BigDecimal fxMarkupPercent,
+                TransferType transferType
+        ) {
+            this.fee = fee;
+            this.exchangeRate = exchangeRate;
+            this.retailRate = retailRate;
+            this.recipientAmount = recipientAmount;
+            this.totalDebitAmount = totalDebitAmount;
+            this.fxMarkupPercent = fxMarkupPercent;
+            this.transferType = transferType;
         }
-
-        // Same currency but different countries transfer fees @1%
-        if(senderCurrency == recipientCurrency) {
-            return senderAmount.multiply(new BigDecimal("0.01"));
-        }
-
-        // All international transfers (different currencies) fee @0.00
-        return BigDecimal.ZERO;
     }
+
+    private TransferCalculation calculateTransfer(
+            BigDecimal senderAmount,
+            Currency senderCurrency,
+            Currency recipientCurrency,
+            Country senderCountry,
+            Country recipientCountry
+    ) {
+        BigDecimal exchangeRate = BigDecimal.ONE;
+        BigDecimal retailRate = BigDecimal.ONE;
+        BigDecimal recipientAmount = senderAmount;
+        BigDecimal fee = BigDecimal.ZERO;
+        BigDecimal fxMarkupPercent = BigDecimal.ZERO;
+        TransferType transferType;
+
+        if (senderCountry == recipientCountry) {
+            transferType = TransferType.DOMESTIC_FREE;
+        } else if (senderCurrency == recipientCurrency) {
+            transferType = TransferType.INTERNATIONAL_SAME_CURRENCY;
+            fee = senderAmount.multiply(new BigDecimal("0.01"));
+        } else {
+            transferType = TransferType.INTERNATIONAL_FX;
+            fxMarkupPercent = new BigDecimal("2.00");
+
+            exchangeRate = fxRateService.getExchangeRate(senderCurrency, recipientCurrency);
+            retailRate = exchangeRate.multiply(new BigDecimal("0.98")).setScale(4, RoundingMode.HALF_DOWN);
+            recipientAmount = senderAmount.multiply(retailRate).setScale(2, RoundingMode.HALF_DOWN);
+        }
+
+        BigDecimal totalDebitAmount = senderAmount.add(fee);
+
+        return new TransferCalculation(
+                fee,
+                exchangeRate,
+                retailRate,
+                recipientAmount,
+                totalDebitAmount,
+                fxMarkupPercent,
+                transferType
+        );
+    }
+
+
 }
