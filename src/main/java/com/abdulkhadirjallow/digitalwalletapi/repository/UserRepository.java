@@ -4,6 +4,7 @@ import com.abdulkhadirjallow.digitalwalletapi.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -11,6 +12,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // fetching a specific user for login
     Optional<User> findByPhoneNumber(String phoneNumber);
+    List<User> findTop5ByPhoneNumberContainingAndVerifiedTrueAndIdNot(String phoneNumber, Long userId);
 
     // Checks if email already exists
     boolean existsByEmail(String email);

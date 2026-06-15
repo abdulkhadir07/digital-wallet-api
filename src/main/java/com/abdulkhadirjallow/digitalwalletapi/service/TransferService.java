@@ -1,9 +1,6 @@
 package com.abdulkhadirjallow.digitalwalletapi.service;
 
-import com.abdulkhadirjallow.digitalwalletapi.dto.RecipientInfo;
-import com.abdulkhadirjallow.digitalwalletapi.dto.TransferQuoteRequest;
-import com.abdulkhadirjallow.digitalwalletapi.dto.TransferQuoteResponse;
-import com.abdulkhadirjallow.digitalwalletapi.dto.TransferRequest;
+import com.abdulkhadirjallow.digitalwalletapi.dto.*;
 import com.abdulkhadirjallow.digitalwalletapi.entity.*;
 import com.abdulkhadirjallow.digitalwalletapi.enums.*;
 import com.abdulkhadirjallow.digitalwalletapi.exception.BadRequestException;
@@ -191,6 +188,20 @@ public class TransferService {
 
         // return all transfers received by user
         return transferRepository.findByRecipientUserIdOrderByCreatedAtDesc(recipientUserId);
+    }
+
+    public List<RecipientSearchResponse> searchRecipients(Long userId, String phoneNumber) {
+        String searchTerm = phoneNumber == null ? "" : phoneNumber.trim();
+
+        if (searchTerm.length() < 7) {
+            return List.of();
+        }
+
+        return userRepository
+                .findTop5ByPhoneNumberContainingAndVerifiedTrueAndIdNot(searchTerm, userId)
+                .stream()
+                .map(RecipientSearchResponse::from)
+                .toList();
     }
 
     // helper methods

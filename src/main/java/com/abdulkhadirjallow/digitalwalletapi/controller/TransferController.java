@@ -63,6 +63,17 @@ public class TransferController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/recipients/search")
+    public ResponseEntity<List<RecipientSearchResponse>> searchRecipients(@AuthenticationPrincipal UserPrincipal principal, @RequestParam String phone) {
+
+        // get authenticated user
+        Long userId = principal.getUserId();
+
+        List<RecipientSearchResponse> recipients = transferService.searchRecipients(userId, phone);
+
+        return new ResponseEntity<>(recipients, HttpStatus.OK);
+    }
+
     @GetMapping("/{reference}")
     public ResponseEntity <TransferResponse> getTransferByReference(@AuthenticationPrincipal UserPrincipal principal,@PathVariable String reference) {
 
