@@ -26,4 +26,8 @@ public class WalletTransactionResponse {
     private BigDecimal balanceBefore;
     private BigDecimal balanceAfter;
     private LocalDateTime createdAt;
+
+    private String transferReference;
+    private String counterpartyName;
+    private String counterpartyPhoneNumber;
 }

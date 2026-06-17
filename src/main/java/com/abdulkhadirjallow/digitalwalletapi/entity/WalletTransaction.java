@@ -52,6 +52,8 @@ public class WalletTransaction {
     @Column(nullable = false, unique = true, updatable = false)
     private String reference;
 
+    private String transferReference;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

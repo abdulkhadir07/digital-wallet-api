@@ -84,21 +84,6 @@ public class TransferService {
             throw new BadRequestException("You have insufficient funds");
         }
 
-        // debit sender and credit recipient
-        walletService.debitWallet(
-                senderUser.getId(),
-                calculation.totalDebitAmount,
-                TransactionSource.TRANSFER,
-                transferRequest.getDescription()
-        );
-
-        walletService.creditWallet(
-                recipient.getId(),
-                calculation.recipientAmount,
-                TransactionSource.TRANSFER,
-                transferRequest.getDescription()
-        );
-
         // Map request DTO to entity
         Transfer transfer = new Transfer();
 
@@ -115,7 +100,26 @@ public class TransferService {
         transfer.setDescription(transferRequest.getDescription());
         transfer.setTransferStatus(TransferStatus.COMPLETED);
 
-        return transferRepository.save(transfer);
+        Transfer savedTransfer = transferRepository.save(transfer);
+
+        // debit sender and credit recipient
+        walletService.debitWallet(
+                senderUser.getId(),
+                calculation.totalDebitAmount,
+                TransactionSource.TRANSFER,
+                transferRequest.getDescription(),
+                savedTransfer.getReference()
+        );
+
+        walletService.creditWallet(
+                recipient.getId(),
+                calculation.recipientAmount,
+                TransactionSource.TRANSFER,
+                transferRequest.getDescription(),
+                savedTransfer.getReference()
+        );
+
+        return savedTransfer;
     }
 
     public TransferQuoteResponse quoteTransfer(Long userId, TransferQuoteRequest transferQuoteRequest) {
