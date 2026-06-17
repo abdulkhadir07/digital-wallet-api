@@ -52,7 +52,7 @@ public class WalletService {
     }
 
     @Transactional
-    public WalletTransaction debitWallet(Long userId,BigDecimal amount,TransactionSource transactionSource, String description) {
+    public WalletTransaction debitWallet(Long userId,BigDecimal amount,TransactionSource transactionSource, String description, String transferReference) {
 
         Wallet wallet = walletRepository.findByUserIdForUpdate(userId)
                 .orElseThrow(()-> new BadRequestException("User wallet not found"));
@@ -79,11 +79,11 @@ public class WalletService {
         wallet.setBalance(balanceAfter);
         walletRepository.save(wallet);
 
-        return createTransaction(wallet,TransactionType.DEBIT,transactionSource,amount,balanceBefore,balanceAfter,description);
+        return createTransaction(wallet,TransactionType.DEBIT,transactionSource,amount,balanceBefore,balanceAfter,description,transferReference);
     }
 
     @Transactional
-    public WalletTransaction creditWallet(Long userId, BigDecimal amount, TransactionSource transactionSource,String description) {
+    public WalletTransaction creditWallet(Long userId, BigDecimal amount, TransactionSource transactionSource,String description, String transferReference) {
 
         Wallet wallet = walletRepository.findByUserIdForUpdate(userId)
                 .orElseThrow(() -> new BadRequestException("User wallet not found"));
@@ -102,7 +102,7 @@ public class WalletService {
         wallet.setBalance(balanceAfter);
         walletRepository.save(wallet);
 
-        return createTransaction(wallet,TransactionType.CREDIT,transactionSource,amount,balanceBefore,balanceAfter,description);
+        return createTransaction(wallet,TransactionType.CREDIT,transactionSource,amount,balanceBefore,balanceAfter,description,transferReference);
     }
 
 
@@ -113,7 +113,8 @@ public class WalletService {
                                                 BigDecimal amount,
                                                 BigDecimal balanceBefore,
                                                 BigDecimal balanceAfter,
-                                                String description) {
+                                                String description,
+                                                String transferReference) {
 
 
         WalletTransaction walletTransaction = new WalletTransaction();
@@ -125,6 +126,7 @@ public class WalletService {
         walletTransaction.setBalanceBefore(balanceBefore);
         walletTransaction.setBalanceAfter(balanceAfter);
         walletTransaction.setDescription(description);
+        walletTransaction.setTransferReference(transferReference);
 
         walletTransaction.setTransactionStatus(TransactionStatus.COMPLETED);
         return walletTransactionRepository.save(walletTransaction);

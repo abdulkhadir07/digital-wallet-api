@@ -2,8 +2,13 @@ package com.abdulkhadirjallow.digitalwalletapi.controller;
 
 import com.abdulkhadirjallow.digitalwalletapi.dto.WalletResponse;
 import com.abdulkhadirjallow.digitalwalletapi.dto.WalletTransactionResponse;
+import com.abdulkhadirjallow.digitalwalletapi.entity.Transfer;
+import com.abdulkhadirjallow.digitalwalletapi.entity.User;
 import com.abdulkhadirjallow.digitalwalletapi.entity.Wallet;
 import com.abdulkhadirjallow.digitalwalletapi.entity.WalletTransaction;
+import com.abdulkhadirjallow.digitalwalletapi.enums.TransactionSource;
+import com.abdulkhadirjallow.digitalwalletapi.enums.TransactionType;
+import com.abdulkhadirjallow.digitalwalletapi.repository.TransferRepository;
 import com.abdulkhadirjallow.digitalwalletapi.security.UserPrincipal;
 import com.abdulkhadirjallow.digitalwalletapi.service.WalletService;
 import org.springframework.http.HttpStatus;
@@ -18,9 +23,11 @@ import java.util.List;
 public class WalletController {
 
     private final WalletService walletService;
+    private final TransferRepository transferRepository;
 
-    public WalletController(WalletService walletService) {
+    public WalletController(WalletService walletService, TransferRepository transferRepository) {
         this.walletService = walletService;
+        this.transferRepository = transferRepository;
 
     }
 
@@ -47,18 +54,38 @@ public class WalletController {
 
         // Map Response DTO
         List<WalletTransactionResponse> walletTransactionResponse = walletTransaction.stream()
-                .map( tx -> new WalletTransactionResponse (
-                        tx.getReference(),
-                        tx.getDescription(),
-                        tx.getTransactionType(),
-                        tx.getTransactionStatus(),
-                        tx.getTransactionSource(),
-                        tx.getAmount(),
-                        tx.getBalanceBefore(),
-                        tx.getBalanceAfter(),
-                        tx.getCreatedAt()
+                .map(tx -> {
+                    String counterpartyName = null;
+                    String counterpartyPhoneNumber = null;
 
-                ))
+                    if (tx.getTransactionSource() == TransactionSource.TRANSFER && tx.getTransferReference() != null) {
+                        Transfer transfer = transferRepository.findByReference(tx.getTransferReference()).orElse(null);
+
+                        if (transfer != null) {
+                            User counterparty = tx.getTransactionType() == TransactionType.DEBIT
+                                    ? transfer.getRecipientUser()
+                                    : transfer.getSenderUser();
+
+                            counterpartyName = counterparty.getFirstName() + " " + counterparty.getLastName();
+                            counterpartyPhoneNumber = counterparty.getPhoneNumber();
+                        }
+                    }
+
+                    return new WalletTransactionResponse(
+                            tx.getReference(),
+                            tx.getDescription(),
+                            tx.getTransactionType(),
+                            tx.getTransactionStatus(),
+                            tx.getTransactionSource(),
+                            tx.getAmount(),
+                            tx.getBalanceBefore(),
+                            tx.getBalanceAfter(),
+                            tx.getCreatedAt(),
+                            tx.getTransferReference(),
+                            counterpartyName,
+                            counterpartyPhoneNumber
+                    );
+                })
                 .toList();
         return new ResponseEntity<>(walletTransactionResponse,HttpStatus.OK);
     }
