@@ -72,7 +72,7 @@ public class TransferService {
         );
 
         // Check KYC status only if senderAmount is greater than or equal to 200
-        BigDecimal limit = new BigDecimal("200.00");
+        BigDecimal limit = new BigDecimal("75,000.00");
         if (transferRequest.getSenderAmount().compareTo(limit) >= 0) {
             KycProfile kycProfile = kycProfileRepository.findByUserId(senderUser.getId())
                     .orElseThrow(() -> new BadRequestException("KYC verification is required for transfers $200 and above"));
