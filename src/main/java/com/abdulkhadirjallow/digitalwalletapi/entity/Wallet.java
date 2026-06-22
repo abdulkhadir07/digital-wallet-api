@@ -52,7 +52,7 @@ public class Wallet {
         this.currency = user.getCountry().getDefaultCurrency();
 
         //DEV ONLY: initialize with default balance for testing purposes only
-        this.balance = new BigDecimal("100,000.00");
+        this.balance = new BigDecimal("100000.00");
 
         this.walletStatus = WalletStatus.ACTIVE;
     }
