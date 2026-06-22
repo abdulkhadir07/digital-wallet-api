@@ -31,7 +31,10 @@ public class SecurityConfig {
                     .csrf(csrf -> csrf.disable())// Disable CSRF for stateless APIs
                     .cors(cors -> cors.configurationSource(request -> {
                         var config = new org.springframework.web.cors.CorsConfiguration();
-                        config.setAllowedOriginPatterns(java.util.List.of("*"));
+                        config.setAllowedOriginPatterns(java.util.List.of(
+                                "http://localhost:5501",
+                                "http://127.0.0.1:5501",
+                                "https://linkcoreweb.netlify.app"));
                         config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                         config.setAllowedHeaders(java.util.List.of("*"));
                         config.setAllowCredentials(true);
