@@ -74,8 +74,10 @@ public class AuthService {
     public String login(LoginRequest loginRequest) {
 
         // find user by phone number
-       User user = userRepository.findByPhoneNumber(loginRequest.getPhoneNumber().trim())
-               .orElseThrow(() -> new UnauthorizedException("Invalid phone number or password"));
+        String normalizedPhoneNumber = loginRequest.getPhoneNumber().replace(" ", "").trim();
+
+        User user = userRepository.findByNormalizedPhoneNumber(normalizedPhoneNumber)
+                .orElseThrow(() -> new BadRequestException("Invalid phone number or password"));
 
        // Compare raw password with the hashed password in DB
        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
