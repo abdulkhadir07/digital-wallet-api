@@ -1,5 +1,7 @@
 package com.abdulkhadirjallow.digitalwalletapi.service;
 
+import com.abdulkhadirjallow.digitalwalletapi.dto.DepositRequest;
+import com.abdulkhadirjallow.digitalwalletapi.dto.DepositResponse;
 import com.abdulkhadirjallow.digitalwalletapi.entity.User;
 import com.abdulkhadirjallow.digitalwalletapi.entity.Wallet;
 import com.abdulkhadirjallow.digitalwalletapi.entity.WalletTransaction;
@@ -169,6 +171,41 @@ public class WalletService {
 
         wallet.setWalletStatus(WalletStatus.ACTIVE);
         return walletRepository.save(wallet);
+    }
+
+    @Transactional
+    public DepositResponse deposit(Long userId, DepositRequest depositRequest) {
+
+        // Find the user wallet
+        Wallet wallet = walletRepository.findByUserId(userId)
+                .orElseThrow(() -> new BadRequestException("User wallet not found"));
+
+        // TODO: integrate payment processor here (Stripe for card, Plaid for bank, agent system for AGENT)
+        // For now we credit the wallet directly as a stub
+
+        String description = "Deposit via " + depositRequest.getPaymentMethod().name().replace("_", " ").toLowerCase();
+
+        WalletTransaction transaction = creditWallet(
+                userId,
+                depositRequest.getAmount(),
+                TransactionSource.BANK_DEPOSIT,
+                description,
+                null
+        );
+
+        // Reload wallet to get updated balance
+        Wallet updatedWallet = walletRepository.findByUserId(userId)
+                .orElseThrow(() -> new BadRequestException("User wallet not found"));
+
+        return new DepositResponse(
+                "Deposit successful",
+                depositRequest.getAmount(),
+                updatedWallet.getBalance(),
+                updatedWallet.getCurrency(),
+                depositRequest.getPaymentMethod(),
+                transaction.getReference(),
+                transaction.getCreatedAt()
+        );
     }
 
 }

@@ -1,5 +1,7 @@
 package com.abdulkhadirjallow.digitalwalletapi.controller;
 
+import com.abdulkhadirjallow.digitalwalletapi.dto.DepositRequest;
+import com.abdulkhadirjallow.digitalwalletapi.dto.DepositResponse;
 import com.abdulkhadirjallow.digitalwalletapi.dto.WalletResponse;
 import com.abdulkhadirjallow.digitalwalletapi.dto.WalletTransactionResponse;
 import com.abdulkhadirjallow.digitalwalletapi.entity.Transfer;
@@ -11,6 +13,7 @@ import com.abdulkhadirjallow.digitalwalletapi.enums.TransactionType;
 import com.abdulkhadirjallow.digitalwalletapi.repository.TransferRepository;
 import com.abdulkhadirjallow.digitalwalletapi.security.UserPrincipal;
 import com.abdulkhadirjallow.digitalwalletapi.service.WalletService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -112,6 +115,16 @@ public class WalletController {
         Wallet wallet = walletService.unfreezeWallet(userId);
 
         return new ResponseEntity<>(toWalletResponse(wallet),HttpStatus.OK);
+    }
+
+    @PostMapping("/deposit")
+    public ResponseEntity<DepositResponse> deposit(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @Valid @RequestBody DepositRequest depositRequest) {
+
+        Long userId = principal.getUserId();
+        DepositResponse response = walletService.deposit(userId, depositRequest);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // Helper method
