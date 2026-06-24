@@ -1,9 +1,6 @@
 package com.abdulkhadirjallow.digitalwalletapi.service;
 
-import com.abdulkhadirjallow.digitalwalletapi.dto.LoginRequest;
-import com.abdulkhadirjallow.digitalwalletapi.dto.RegisterRequest;
-import com.abdulkhadirjallow.digitalwalletapi.dto.RegisterResponse;
-import com.abdulkhadirjallow.digitalwalletapi.dto.VerifyRequest;
+import com.abdulkhadirjallow.digitalwalletapi.dto.*;
 import com.abdulkhadirjallow.digitalwalletapi.entity.User;
 import com.abdulkhadirjallow.digitalwalletapi.exception.BadRequestException;
 import com.abdulkhadirjallow.digitalwalletapi.exception.UnauthorizedException;
@@ -123,6 +120,39 @@ public class AuthService {
         user.setVerified(true);
         user.setVerificationCode(null);
         user.setVerificationCodeExpiresAt(null);
+        userRepository.save(user);
+    }
+
+    public UserProfileResponse getProfile(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BadRequestException("User not found"));
+
+        return UserProfileResponse.from(user);
+    }
+
+    @Transactional
+    public void changePassword(Long userId, ChangePasswordRequest changePasswordRequest) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BadRequestException("User not found"));
+
+        // verify current password matches
+        if (!passwordEncoder.matches(changePasswordRequest.getCurrentPassword(), user.getPassword())) {
+            throw new BadRequestException("Current password is incorrect");
+        }
+
+        // verify new password and confirm password match
+        if (!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmPassword())) {
+            throw new BadRequestException("New password and confirm password do not match");
+        }
+
+        // make sure new password is different from current password
+        if (passwordEncoder.matches(changePasswordRequest.getNewPassword(), user.getPassword())) {
+            throw new BadRequestException("New password must be different from your current password");
+        }
+
+        // hash and save new password
+        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
         userRepository.save(user);
     }
 

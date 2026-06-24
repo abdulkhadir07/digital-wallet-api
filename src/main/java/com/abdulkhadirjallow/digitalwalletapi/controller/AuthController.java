@@ -1,14 +1,13 @@
 package com.abdulkhadirjallow.digitalwalletapi.controller;
 
 import com.abdulkhadirjallow.digitalwalletapi.dto.*;
+import com.abdulkhadirjallow.digitalwalletapi.security.UserPrincipal;
 import com.abdulkhadirjallow.digitalwalletapi.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -57,5 +56,23 @@ public class AuthController {
 
         // return response
         return new ResponseEntity<>(verifyResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserProfileResponse> getProfile(@AuthenticationPrincipal UserPrincipal principal) {
+
+        Long userId = principal.getUserId();
+        UserProfileResponse profile = authService.getProfile(userId);
+        return new ResponseEntity<>(profile, HttpStatus.OK);
+    }
+
+    @PatchMapping("/change-password")
+    public ResponseEntity<Void> changePassword(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
+
+        Long userId = principal.getUserId();
+        authService.changePassword(userId, changePasswordRequest);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
