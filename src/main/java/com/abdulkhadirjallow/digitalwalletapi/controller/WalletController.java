@@ -1,9 +1,6 @@
 package com.abdulkhadirjallow.digitalwalletapi.controller;
 
-import com.abdulkhadirjallow.digitalwalletapi.dto.DepositRequest;
-import com.abdulkhadirjallow.digitalwalletapi.dto.DepositResponse;
-import com.abdulkhadirjallow.digitalwalletapi.dto.WalletResponse;
-import com.abdulkhadirjallow.digitalwalletapi.dto.WalletTransactionResponse;
+import com.abdulkhadirjallow.digitalwalletapi.dto.*;
 import com.abdulkhadirjallow.digitalwalletapi.entity.Transfer;
 import com.abdulkhadirjallow.digitalwalletapi.entity.User;
 import com.abdulkhadirjallow.digitalwalletapi.entity.Wallet;
@@ -118,9 +115,7 @@ public class WalletController {
     }
 
     @PostMapping("/deposit")
-    public ResponseEntity<DepositResponse> deposit(
-            @AuthenticationPrincipal UserPrincipal principal,
-            @Valid @RequestBody DepositRequest depositRequest) {
+    public ResponseEntity<DepositResponse> deposit(@AuthenticationPrincipal UserPrincipal principal, @Valid @RequestBody DepositRequest depositRequest) {
 
         Long userId = principal.getUserId();
         DepositResponse response = walletService.deposit(userId, depositRequest);
@@ -136,6 +131,14 @@ public class WalletController {
                 wallet.getCreatedAt(),
                 wallet.getUpdatedAt()
         );
+    }
+
+    @PostMapping("/withdraw")
+    public ResponseEntity<WithdrawalResponse> withdraw(@AuthenticationPrincipal UserPrincipal principal, @Valid @RequestBody WithdrawalRequest withdrawalRequest) {
+
+        Long userId = principal.getUserId();
+        WithdrawalResponse response = walletService.withdraw(userId, withdrawalRequest);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
 

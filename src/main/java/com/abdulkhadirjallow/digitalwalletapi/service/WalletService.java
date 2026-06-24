@@ -2,6 +2,8 @@ package com.abdulkhadirjallow.digitalwalletapi.service;
 
 import com.abdulkhadirjallow.digitalwalletapi.dto.DepositRequest;
 import com.abdulkhadirjallow.digitalwalletapi.dto.DepositResponse;
+import com.abdulkhadirjallow.digitalwalletapi.dto.WithdrawalRequest;
+import com.abdulkhadirjallow.digitalwalletapi.dto.WithdrawalResponse;
 import com.abdulkhadirjallow.digitalwalletapi.entity.User;
 import com.abdulkhadirjallow.digitalwalletapi.entity.Wallet;
 import com.abdulkhadirjallow.digitalwalletapi.entity.WalletTransaction;
@@ -180,7 +182,7 @@ public class WalletService {
         Wallet wallet = walletRepository.findByUserId(userId)
                 .orElseThrow(() -> new BadRequestException("User wallet not found"));
 
-        // TODO: integrate payment processor here (Stripe for card, Plaid for bank, agent system for AGENT)
+        // TODO: integrate payment processor (Stripe for card, Plaid for bank, agent system for AGENT)
         // For now we credit the wallet directly as a stub
 
         String description = "Deposit via " + depositRequest.getPaymentMethod().name().replace("_", " ").toLowerCase();
@@ -203,6 +205,36 @@ public class WalletService {
                 updatedWallet.getBalance(),
                 updatedWallet.getCurrency(),
                 depositRequest.getPaymentMethod(),
+                transaction.getReference(),
+                transaction.getCreatedAt()
+        );
+    }
+
+    @Transactional
+    public WithdrawalResponse withdraw(Long userId, WithdrawalRequest withdrawalRequest) {
+
+        // TODO: integrate payout processor (Stripe for card, ACH/Plaid for bank, agent system for AGENT)
+        // For now we debit the wallet directly as a stub
+
+        String description = "Withdrawal via " + withdrawalRequest.getPaymentMethod().name().replace("_", " ").toLowerCase();
+
+        WalletTransaction transaction = debitWallet(
+                userId,
+                withdrawalRequest.getAmount(),
+                TransactionSource.BANK_WITHDRAWAL,
+                description,
+                null
+        );
+
+        Wallet updatedWallet = walletRepository.findByUserId(userId)
+                .orElseThrow(() -> new BadRequestException("User wallet not found"));
+
+        return new WithdrawalResponse(
+                "Withdrawal request submitted successfully",
+                withdrawalRequest.getAmount(),
+                updatedWallet.getBalance(),
+                updatedWallet.getCurrency(),
+                withdrawalRequest.getPaymentMethod(),
                 transaction.getReference(),
                 transaction.getCreatedAt()
         );
